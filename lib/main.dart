@@ -1,6 +1,8 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:quizzler/quizBrain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 void main() {
   runApp(
@@ -37,16 +39,57 @@ class Quizpage extends StatefulWidget {
 }
 
 class _QuizpageState extends State<Quizpage> {
+  void checkAnswer(bool userPickedAnswer) {
+    bool currectAnswer = quizBrain.getQuetionAnswer();
+
+    setState(() {
+      if (quizBrain.isFinished()) {
+        Alert(context: context, title: "Finished!", desc: "You\'ve reached the end of the quiz.")
+            .show();
+        quizBrain.reset();
+        scoreKeeper.clear();
+      } else {
+        if (userPickedAnswer == currectAnswer) {
+          scoreKeeper.add(
+            const Icon(
+              Icons.check,
+              color: Colors.green,
+            ),
+          );
+        } else {
+          scoreKeeper.add(
+            const Icon(
+              Icons.close,
+              color: Colors.red,
+            ),
+          );
+        }
+        quizBrain.nextQuestion();
+      }
+    });
+  }
+
   List<Icon> scoreKeeper = [];
 
-  List<String> question = [
-    'You can lead a cow down stairs but not up stairs',
-    'Approximately one quarter of human bones are in the feet.',
-    'A slug\'s blood is green. '
-  ];
-  List<bool> answer = [false, true, true];
+//questionBank
+  // List<String> question = [
+  //   'You can lead a cow down stairs but not up stairs',
+  //   'Approximately one quarter of human bones are in the feet.',
+  //   'A slug\'s blood is green. '
+  // ];
+  // List<bool> answer = [false, true, true];
 
-  int queNumber = 0;
+  // Question q1=Question(q: 'You can lead a cow down stairs but not up stairs', a: false);
+
+//quizBrain
+  // List<Question> questionBank=[
+  //   Question(q: 'You can lead a cow down stairs but not up stairs', a: false),
+  //   Question(q: 'Approximately one quarter of human bones are in the feet.', a: true),
+  //   Question(q: 'A slug\'s blood is green.', a: true),
+  // ];
+  QuizBrain quizBrain = QuizBrain();
+
+  // int queNumber = 0;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -59,7 +102,7 @@ class _QuizpageState extends State<Quizpage> {
             padding: const EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                question[queNumber],
+                quizBrain.getQuestionText(),
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: Colors.white, fontSize: 25.0),
               ),
@@ -73,26 +116,7 @@ class _QuizpageState extends State<Quizpage> {
               textColor: Colors.white,
               color: Colors.green,
               onPressed: () {
-                setState(() {
-                  bool currectAns = answer[queNumber];
-                  if (currectAns == true) {
-                    scoreKeeper.add(
-                      const Icon(
-                        Icons.check,
-                        color: Colors.green,
-                      ),
-                    );
-                  } else {
-                    scoreKeeper.add(
-                      const Icon(
-                        Icons.close,
-                        color: Colors.red,
-                      ),
-                    );
-                  }
-
-                  queNumber++;
-                });
+                checkAnswer(true);
               },
               child: const Text(
                 'True',
@@ -109,26 +133,7 @@ class _QuizpageState extends State<Quizpage> {
               textColor: Colors.white,
               color: Colors.red,
               onPressed: () {
-                setState(() {
-                  bool currectAns = answer[queNumber];
-                  if (currectAns == false) {
-                    scoreKeeper.add(
-                      const Icon(
-                        Icons.check,
-                        color: Colors.green,
-                      ),
-                    );
-                  } else {
-                    scoreKeeper.add(
-                      const Icon(
-                        Icons.close,
-                        color: Colors.red,
-                      ),
-                    );
-                  }
-
-                  queNumber++;
-                });
+                checkAnswer(false);
               },
               child: const Text(
                 'Flase',
